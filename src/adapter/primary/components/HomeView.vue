@@ -6,8 +6,17 @@ export default {
 <script setup lang="ts"></script>
 
 <template>
-  <h1 class="text-bold text-secondary">Le champ du fort</h1>
-  <img src="@/adapter/primary/assets/img/unnamed.jpg" alt="logo" id="logo" />
+  <q-page-container class="row flex justify-center">
+    <q-card class="col-8">
+      <q-card-section>
+        <h5>Intervention Schedule</h5>
+        <h6>Plomberie FAURE</h6>
+      </q-card-section>
+      <q-card-section>
+        <q-btn label="Go to About" to="/" />
+      </q-card-section>
+    </q-card>
+  </q-page-container>
 </template>
 
 <style lang="sass" scoped>
