@@ -42,7 +42,7 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 ├── index.html
 ├── package.json
 ├── test
-│   ├── HomeView.spec.ts
+│   ├── EventUseCase.spec.ts
 ├── public
 │   ├── favicon.ico
 │   ├── robots.txt
@@ -73,7 +73,7 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 |   |   |  |    └── InMemoryRepository
 │   ├── domain
 │   |   ├── useCase
-|   |   |   ├── UseCase.ts
+|   |   |   ├── EventUseCase.ts
 ├── shims-vue.d.ts
 ├── tsconfig.json
 ├── vite.config.ts

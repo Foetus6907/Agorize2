@@ -10,11 +10,15 @@ declare module "*.vue" {
 declare module "*.svg" {
   import type { DefineComponent } from "vue";
   const component: DefineComponent;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   export default component;
 }
 
 declare module "*.png" {
   import type { DefineComponent } from "vue";
   const component: DefineComponent;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   export default component;
 }
