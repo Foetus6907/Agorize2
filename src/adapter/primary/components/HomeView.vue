@@ -4,7 +4,7 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 /*
  * Set the Recurring Opening Event for Company Plomberie Faure
  */
@@ -14,7 +14,7 @@ const timeMask = "HH:mm";
 const recurringOpeningEvent = reactive({
   id: "1",
   title: "Plomberie Faure",
-  day: "2019-07-01",
+  day: "2023-01-06",
   startTime: "10:30",
   endTime: "14:00",
   color: "green",
@@ -26,16 +26,47 @@ const recurringOpeningEvent = reactive({
 const scheduledInterventionEvent = reactive({
   id: "1",
   title: "Jean Dupont",
-  day: "2019-07-01",
-  startTime: "10:30",
-  endTime: "14:00",
+  day: "2023-01-13",
+  startTime: "11:30",
+  endTime: "12:30",
   color: "red",
 });
+
+enum EnumCardToShow {
+  RecurringOpeningEvent,
+  ScheduledInterventionEvent,
+  AvailabilityRequest,
+  ShowAvailabilities,
+}
+let cardToShow = ref(EnumCardToShow.RecurringOpeningEvent);
+const setRecurringOpeningEvent = () => {
+  cardToShow.value = EnumCardToShow.ScheduledInterventionEvent;
+};
+
+const setScheduledInterventionEvent = () => {
+  cardToShow.value = EnumCardToShow.AvailabilityRequest;
+};
+
+const availabilitiesRequestMask = "YYYY-MM-DD HH:mm";
+// availabilitiesRequest: create a new request for availabilities
+const availabilitiesRequest = reactive({
+  id: "2",
+  title: "Jon Wick",
+  date: { from: "2023-01-09 11:30", to: "2023-01-16 12:30" },
+  color: "blue",
+});
+
+const requestAvailabilities = () => {
+  cardToShow.value = EnumCardToShow.ShowAvailabilities;
+};
 </script>
 
 <template>
   <q-page-container class="row flex justify-center">
-    <q-card class="col-10">
+    <q-card
+      v-if="cardToShow === EnumCardToShow.RecurringOpeningEvent"
+      class="col-10"
+    >
       <q-card-section>
         <h5 class="q-ma-xs">
           Set your weekly recurring opening day and hours:
@@ -67,6 +98,7 @@ const scheduledInterventionEvent = reactive({
               }}
             </p>
             <q-time
+              :format24h="true"
               v-model="recurringOpeningEvent.startTime"
               :mask="timeMask"
               :color="recurringOpeningEvent.color"
@@ -81,6 +113,7 @@ const scheduledInterventionEvent = reactive({
               }}
             </p>
             <q-time
+              :format24h="true"
               v-model="recurringOpeningEvent.endTime"
               :mask="timeMask"
               :color="recurringOpeningEvent.color"
@@ -89,10 +122,13 @@ const scheduledInterventionEvent = reactive({
         </div>
       </q-card-section>
       <q-card-actions class="justify-center">
-        <q-btn color="primary" label="Save" />
+        <q-btn color="primary" label="Save" @click="setRecurringOpeningEvent" />
       </q-card-actions>
     </q-card>
-    <q-card class="col-10">
+    <q-card
+      v-if="cardToShow === EnumCardToShow.ScheduledInterventionEvent"
+      class="col-10"
+    >
       <q-card-section>
         <h5 class="q-ma-xs">
           Set you schedule Intervention with {{ recurringOpeningEvent.title }}:
@@ -126,6 +162,7 @@ const scheduledInterventionEvent = reactive({
               }}
             </p>
             <q-time
+              :format24h="true"
               v-model="scheduledInterventionEvent.startTime"
               :mask="timeMask"
               :color="scheduledInterventionEvent.color"
@@ -142,6 +179,7 @@ const scheduledInterventionEvent = reactive({
               }}
             </p>
             <q-time
+              :format24h="true"
               v-model="scheduledInterventionEvent.endTime"
               :mask="timeMask"
               :color="scheduledInterventionEvent.color"
@@ -150,7 +188,143 @@ const scheduledInterventionEvent = reactive({
         </div>
       </q-card-section>
       <q-card-actions class="justify-center">
-        <q-btn color="primary" label="Save" />
+        <q-btn
+          color="primary"
+          label="Save"
+          @click="setScheduledInterventionEvent"
+        />
+      </q-card-actions>
+    </q-card>
+
+    <q-card
+      v-if="cardToShow === EnumCardToShow.AvailabilityRequest"
+      class="col-10"
+    >
+      <q-card-section>
+        <h5 class="q-ma-xs">
+          Find availabilities {{ availabilitiesRequest.title }}:
+        </h5>
+        <h6 class="q-ma-xs">
+          Resident: {{ availabilitiesRequest.id }} -
+          {{ availabilitiesRequest.title }}
+        </h6>
+      </q-card-section>
+      <q-card-section>
+        <div class="q-gutter-md row items-start justify-around">
+          <div class="block">
+            <p class="q-ma-xs">
+              From:
+              {{ availabilitiesRequest.date.from }}
+              to
+              {{ availabilitiesRequest.date.to }}
+            </p>
+            <q-date
+              v-model="availabilitiesRequest.date"
+              :mask="availabilitiesRequestMask"
+              :color="availabilitiesRequest.color"
+              range
+            />
+          </div>
+          <div class="block">
+            <p class="q-ma-xs">
+              Select Start time:
+              {{
+                availabilitiesRequest.date?.from.split(" ").reverse().shift() ??
+                ""
+              }}
+            </p>
+            <q-time
+              :format24h="true"
+              v-model="availabilitiesRequest.date.from"
+              :mask="availabilitiesRequestMask"
+              :color="availabilitiesRequest.color"
+            />
+          </div>
+          <div class="block">
+            <p class="q-ma-xs">
+              Select End time:
+              {{
+                availabilitiesRequest.date?.to.split(" ").reverse().shift() ??
+                ""
+              }}
+            </p>
+            <q-time
+              :format24h="true"
+              v-model="availabilitiesRequest.date.to"
+              :mask="availabilitiesRequestMask"
+              :color="availabilitiesRequest.color"
+            />
+          </div>
+        </div>
+      </q-card-section>
+      <q-card-actions class="justify-center">
+        <q-btn color="primary" label="Save" @click="requestAvailabilities" />
+      </q-card-actions>
+    </q-card>
+
+    <q-card
+      v-if="cardToShow === EnumCardToShow.ShowAvailabilities"
+      class="col-10"
+    >
+      <q-card-section>
+        <h5 class="q-ma-xs">
+          Availabilities: {{ recurringOpeningEvent.title }}:
+        </h5>
+        <h6 class="q-ma-xs">
+          Resident: {{ availabilitiesRequest.id }} -
+          {{ availabilitiesRequest.title }}
+        </h6>
+      </q-card-section>
+      <!--      <q-card-section>
+        <div class="q-gutter-md row items-start justify-around">
+          <div class="block">
+            <p class="q-ma-xs">
+              From:
+              {{ availabilitiesRequest.date.from }}
+              to
+              {{ availabilitiesRequest.date.to }}
+            </p>
+            <q-date
+              v-model="availabilitiesRequest.date"
+              :mask="availabilitiesRequestMask"
+              :color="availabilitiesRequest.color"
+              range
+            />
+          </div>
+          <div class="block">
+            <p class="q-ma-xs">
+              Select Start time:
+              {{
+                availabilitiesRequest.date?.from.split(" ").reverse().shift() ??
+                ""
+              }}
+            </p>
+            <q-time
+              :format24h="true"
+              v-model="availabilitiesRequest.date.from"
+              :mask="availabilitiesRequestMask"
+              :color="availabilitiesRequest.color"
+            />
+          </div>
+          <div class="block">
+            <p class="q-ma-xs">
+              Select End time:
+              {{
+                availabilitiesRequest.date?.to.split(" ").reverse().shift() ??
+                ""
+              }}
+            </p>
+            <q-time
+              :format24h="true"
+              v-model="availabilitiesRequest.date.to"
+              :mask="availabilitiesRequestMask"
+              :color="availabilitiesRequest.color"
+            />
+          </div>
+        </div>
+      </q-card-section>-->
+      <q-card-actions class="justify-center">
+        <q-btn color="primary" label="Save" @click="requestAvailabilities" />
       </q-card-actions>
     </q-card>
   </q-page-container>

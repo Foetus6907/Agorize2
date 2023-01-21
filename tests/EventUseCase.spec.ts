@@ -29,8 +29,8 @@ describe("EventUseCase", () => {
 
   it("should add a Recurring Opening Event to the list", async () => {
     const { startDate, endDate } = getStartAndEndDate(
-      "2021-01-07T10:30:00", // July 1st, 10:30
-      "2021-01-07T13:30:00" // July 1st, 13:30
+      "2023-01-01T10:30:00", // January 1st, 10:30
+      "2023-01-01T13:30:00" // January 1st, 13:30
     );
 
     await eventUseCase.createRecurringOpeningEvent(startDate, endDate);
@@ -42,8 +42,8 @@ describe("EventUseCase", () => {
 
   it("should add a Scheduled Intervention Event to the list", async () => {
     const { startDate, endDate } = getStartAndEndDate(
-      "2021-08-07T11:30:00", // July 8th 11:30
-      "2021-08-07T12:30:00" // July 8th 12:30
+      "2023-01-07T11:30:00", // January 7th 11:30
+      "2023-01-07T12:30:00" // January 8th 12:30
     );
 
     await eventUseCase.createScheduledInterventionEvent(startDate, endDate);
