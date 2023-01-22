@@ -69,6 +69,7 @@ export default class EventUseCase {
       );
     });
 
+    /*remove last slot if it is not a full slot*/
     return matchingSlot.splice(0, matchingSlot.length - 1);
   }
 

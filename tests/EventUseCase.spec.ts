@@ -95,5 +95,36 @@ describe("EventUseCase", () => {
       availabilitiesRequestEndDate
     );
     expect(availabilities).toHaveLength(5);
+
+    expect(availabilities).toContain("2023-01-13T10:30:00.000Z");
+    expect(availabilities).toContain("2023-01-13T11:00:00.000Z");
+    expect(availabilities).toContain("2023-01-13T12:30:00.000Z");
+    expect(availabilities).toContain("2023-01-13T13:00:00.000Z");
+    expect(availabilities).toContain("2023-01-13T13:30:00.000Z");
+
+    const {
+      startDate: schedInterEventStartDate2,
+      endDate: schedInterEventEndDate2,
+    } = {
+      startDate: "2023-01-13T12:30:00.000Z", // January 13th 11:30
+      endDate: "2023-01-13T13:00:00.000Z", // January 13th 12:30
+    };
+
+    await eventUseCase.createScheduledInterventionEvent(
+      schedInterEventStartDate2,
+      schedInterEventEndDate2
+    );
+    const availabilities2 = await eventUseCase.getAvailabilities(
+      availabilitiesRequestStartDate,
+      availabilitiesRequestEndDate
+    );
+
+    expect(availabilities2).toHaveLength(4);
+
+    expect(availabilities2).toContain("2023-01-13T10:30:00.000Z");
+    expect(availabilities2).toContain("2023-01-13T11:00:00.000Z");
+    expect(availabilities2).toContain("2023-01-13T12:30:00.000Z");
+
+    expect(availabilities2).toContain("2023-01-13T13:30:00.000Z");
   });
 });
