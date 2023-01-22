@@ -7,24 +7,24 @@ export default class Event {
     return this._recurring;
   }
 
-  get startDate(): Date {
+  get startDate(): string {
     return this._startDate;
   }
 
-  get endDate(): Date {
+  get endDate(): string {
     return this._endDate;
   }
   /*Properties : opening, recurring, startDate, endDate */
   private readonly _opening: boolean;
   private readonly _recurring: boolean;
-  private readonly _startDate: Date;
-  private readonly _endDate: Date;
+  private readonly _startDate: string;
+  private readonly _endDate: string;
 
   constructor(
     opening: boolean,
     recurring: boolean,
-    startDate: Date,
-    endDate: Date
+    startDate: string,
+    endDate: string
   ) {
     this._opening = opening;
     this._recurring = recurring;
