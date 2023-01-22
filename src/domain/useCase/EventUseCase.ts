@@ -51,12 +51,12 @@ export default class EventUseCase {
         allSlots.push(...this.getAllTimeSlots(event.startDate, event.endDate));
       });
 
-    let availableSlots: Array<string> = [];
+    let availableSlots: Array<string> = allSlots;
     this.eventList
       .filter((event) => !event.opening && !event.recurring)
       .forEach((event) => {
         availableSlots = this.removeSlotsMachingInterventionEvent(
-          allSlots,
+          availableSlots,
           event
         );
       });
