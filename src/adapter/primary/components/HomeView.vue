@@ -111,7 +111,7 @@ const groupByDay = (table: string[]) => {
 };
 
 const availabilities: Ref<string[]> = ref([]);
-const groupeByDayAvalabilities: Ref<string[][]> = ref([]);
+const groupeByDayAvalabilities: Ref<{ [p: string]: string[] }> = ref({});
 const requestAvailabilities = async () => {
   let startDate = new Date(availabilitiesRequest.date.from);
   let endDate = new Date(availabilitiesRequest.date.to);
@@ -126,9 +126,7 @@ const requestAvailabilities = async () => {
     // eslint-disable-next-line no-console
     console.error("Error getting availabilities", e);
   }
-  groupeByDayAvalabilities.value = groupByDay(
-    availabilities.value
-  ) as unknown as string[][];
+  groupeByDayAvalabilities.value = groupByDay(availabilities.value);
   cardToShow.value = EnumCardToShow.ShowAvailabilities;
 };
 </script>
@@ -194,7 +192,7 @@ const requestAvailabilities = async () => {
         </div>
       </q-card-section>
       <q-card-actions class="justify-center">
-        <q-btn color="primary" label="Save" @click="setRecurringOpeningEvent" />
+        <q-btn color="primary" label="Next" @click="setRecurringOpeningEvent" />
       </q-card-actions>
     </q-card>
     <q-card
@@ -262,7 +260,7 @@ const requestAvailabilities = async () => {
       <q-card-actions class="justify-center">
         <q-btn
           color="primary"
-          label="Save"
+          label="Next"
           @click="setScheduledInterventionEvent"
         />
       </q-card-actions>
@@ -330,7 +328,7 @@ const requestAvailabilities = async () => {
         </div>
       </q-card-section>
       <q-card-actions class="justify-center">
-        <q-btn color="primary" label="Save" @click="requestAvailabilities" />
+        <q-btn color="primary" label="Next" @click="requestAvailabilities" />
       </q-card-actions>
     </q-card>
 
@@ -340,22 +338,35 @@ const requestAvailabilities = async () => {
     >
       <q-card-section>
         <h5 class="q-ma-xs">
-          Availabilities: {{ recurringOpeningEvent.title }}:
+          Availabilities with contractor: {{ recurringOpeningEvent.title }}:
         </h5>
         <h6 class="q-ma-xs">
           Resident: {{ availabilitiesRequest.id }} -
           {{ availabilitiesRequest.title }}
         </h6>
+        <h6 class="q-ma-xs">
+          From: {{ availabilitiesRequest.date.from }} to
+          {{ availabilitiesRequest.date.to }}
+        </h6>
+        <h6></h6>
       </q-card-section>
       <q-card-section>
         <div class="q-gutter-md row items-start justify-around">
           <div
+            v-if="
+              JSON.stringify(groupeByDayAvalabilities) === JSON.stringify({})
+            "
+          >
+            No availabilities found !
+          </div>
+          <div
+            v-else
             v-for="(day, key) in groupeByDayAvalabilities"
             :key="key"
             class="justify-center items-center q-card col-auto q-ma-sm"
           >
             <div class="q-ma-xs row flex justify-center">
-              {{ new Date(key).toLocaleDateString() }}
+              {{ new Date(day.at(0) ?? "").toLocaleDateString() }}
             </div>
             <div class="row flex justify-center">
               <q-badge
@@ -363,9 +374,9 @@ const requestAvailabilities = async () => {
                 v-for="time in day"
                 :key="time"
                 :label="
-                  new Date(time).getHours() +
+                  new Date(time).getUTCHours() +
                   ':' +
-                  String(new Date(time).getMinutes()).padStart(2, '0')
+                  String(new Date(time).getUTCMinutes()).padStart(2, '0')
                 "
                 :color="recurringOpeningEvent.color"
               />
