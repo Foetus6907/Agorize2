@@ -4,7 +4,7 @@ import Event from "@/domain/model/Event";
 export default class EventUseCase {
   private eventList: Event[] = [];
   private slotTime = 30;
-  private numberRecurringWeeks = 2;
+  private numberRecurringWeeks = 4;
   private readonly eventRepository: EventRepository;
 
   constructor(eventRepository: EventRepository) {
