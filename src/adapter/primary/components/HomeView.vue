@@ -73,7 +73,9 @@ const setRecurringOpeningEvent = () => {
 
   eventUseCase?.createRecurringOpeningEvent(
     startDate.toISOString(),
-    endDate.toISOString()
+    endDate.toISOString(),
+    recurringOpeningEvent.id,
+    recurringOpeningEvent.title
   );
   cardToShow.value = EnumCardToShow.ScheduledInterventionEvent;
 };
@@ -84,7 +86,9 @@ const setScheduledInterventionEvent = () => {
 
   eventUseCase?.createScheduledInterventionEvent(
     startDate.toISOString(),
-    endDate.toISOString()
+    endDate.toISOString(),
+    scheduledInterventionEvent.id,
+    scheduledInterventionEvent.title
   );
   cardToShow.value = EnumCardToShow.AvailabilityRequest;
 };

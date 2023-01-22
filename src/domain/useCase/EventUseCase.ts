@@ -20,17 +20,21 @@ export default class EventUseCase {
 
   async createRecurringOpeningEvent(
     startDate: string,
-    endDate: string
+    endDate: string,
+    id?: string,
+    title?: string
   ): Promise<void> {
-    const event = new Event(true, true, startDate, endDate);
+    const event = new Event(true, true, startDate, endDate, id, title);
     this.eventRepository.addEvent(event);
   }
 
   async createScheduledInterventionEvent(
     startDate: string,
-    endDate: string
+    endDate: string,
+    id?: string,
+    title?: string
   ): Promise<void> {
-    const event = new Event(false, false, startDate, endDate);
+    const event = new Event(false, false, startDate, endDate, id, title);
     this.eventRepository.addEvent(event);
   }
 
