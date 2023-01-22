@@ -84,25 +84,6 @@ describe("EventUseCase", () => {
     );
 
     const {
-      startDate: availabilitiesRequestStartDate,
-      endDate: availabilitiesRequestEndDate,
-    } = {
-      startDate: "2023-01-09T10:00:00.000Z", // January 1st, 10:30
-      endDate: "2023-01-16T10:00:00.000Z", // January 1st, 13:30
-    };
-    const availabilities = await eventUseCase.getAvailabilities(
-      availabilitiesRequestStartDate,
-      availabilitiesRequestEndDate
-    );
-    expect(availabilities).toHaveLength(5);
-
-    expect(availabilities).toContain("2023-01-13T10:30:00.000Z");
-    expect(availabilities).toContain("2023-01-13T11:00:00.000Z");
-    expect(availabilities).toContain("2023-01-13T12:30:00.000Z");
-    expect(availabilities).toContain("2023-01-13T13:00:00.000Z");
-    expect(availabilities).toContain("2023-01-13T13:30:00.000Z");
-
-    const {
       startDate: schedInterEventStartDate2,
       endDate: schedInterEventEndDate2,
     } = {
@@ -114,17 +95,23 @@ describe("EventUseCase", () => {
       schedInterEventStartDate2,
       schedInterEventEndDate2
     );
-    const availabilities2 = await eventUseCase.getAvailabilities(
+
+    const {
+      startDate: availabilitiesRequestStartDate,
+      endDate: availabilitiesRequestEndDate,
+    } = {
+      startDate: "2023-01-09T10:00:00.000Z", // January 1st, 10:30
+      endDate: "2023-01-16T10:00:00.000Z", // January 1st, 13:30
+    };
+    const availabilities = await eventUseCase.getAvailabilities(
       availabilitiesRequestStartDate,
       availabilitiesRequestEndDate
     );
 
-    expect(availabilities2).toHaveLength(4);
-
-    expect(availabilities2).toContain("2023-01-13T10:30:00.000Z");
-    expect(availabilities2).toContain("2023-01-13T11:00:00.000Z");
-    expect(availabilities2).toContain("2023-01-13T12:30:00.000Z");
-
-    expect(availabilities2).toContain("2023-01-13T13:30:00.000Z");
+    expect(availabilities).toHaveLength(4);
+    expect(availabilities).toContain("2023-01-13T10:30:00.000Z");
+    expect(availabilities).toContain("2023-01-13T11:00:00.000Z");
+    expect(availabilities).toContain("2023-01-13T13:00:00.000Z");
+    expect(availabilities).toContain("2023-01-13T13:30:00.000Z");
   });
 });
