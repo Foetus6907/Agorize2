@@ -97,6 +97,19 @@ describe("EventUseCase", () => {
     );
 
     const {
+      startDate: schedInterEventStartDate3,
+      endDate: schedInterEventEndDate3,
+    } = {
+      startDate: "2023-01-13T10:30:00.000Z", // January 13th 11:30
+      endDate: "2023-01-13T11:00:00.000Z", // January 13th 12:30
+    };
+
+    await eventUseCase.createScheduledInterventionEvent(
+      schedInterEventStartDate3,
+      schedInterEventEndDate3
+    );
+
+    const {
       startDate: availabilitiesRequestStartDate,
       endDate: availabilitiesRequestEndDate,
     } = {
@@ -108,8 +121,8 @@ describe("EventUseCase", () => {
       availabilitiesRequestEndDate
     );
 
-    expect(availabilities).toHaveLength(4);
-    expect(availabilities).toContain("2023-01-13T10:30:00.000Z");
+    expect(availabilities).toHaveLength(3);
+    //expect(availabilities).toContain("2023-01-13T10:30:00.000Z");
     expect(availabilities).toContain("2023-01-13T11:00:00.000Z");
     expect(availabilities).toContain("2023-01-13T13:00:00.000Z");
     expect(availabilities).toContain("2023-01-13T13:30:00.000Z");
