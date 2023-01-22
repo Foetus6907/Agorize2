@@ -4,11 +4,28 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { inject, reactive, Ref, ref } from "vue";
+import { EventUseCaseKey } from "@/adapter/primary/symbols";
+const eventUseCase = inject(EventUseCaseKey);
+
+enum EnumCardToShow {
+  RecurringOpeningEvent,
+  ScheduledInterventionEvent,
+  AvailabilityRequest,
+  ShowAvailabilities,
+}
+interface EventRequestForm {
+  id: string;
+  title: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+  color: string;
+}
+let cardToShow = ref(EnumCardToShow.RecurringOpeningEvent);
 /*
  * Set the Recurring Opening Event for Company Plomberie Faure
  */
-
 const dayMask = "YYYY-MM-DD";
 const timeMask = "HH:mm";
 const recurringOpeningEvent = reactive({
@@ -23,7 +40,7 @@ const recurringOpeningEvent = reactive({
 /*
  * Set the Intervention Schedule for Resident Jean Dupont
  */
-const scheduledInterventionEvent = reactive({
+const scheduledInterventionEvent: EventRequestForm = reactive({
   id: "1",
   title: "Jean Dupont",
   day: "2023-01-13",
@@ -32,18 +49,43 @@ const scheduledInterventionEvent = reactive({
   color: "red",
 });
 
-enum EnumCardToShow {
-  RecurringOpeningEvent,
-  ScheduledInterventionEvent,
-  AvailabilityRequest,
-  ShowAvailabilities,
+function getStartDateEventRequestForm(requestForm: EventRequestForm) {
+  let startDate = new Date(requestForm.day);
+  startDate.setUTCHours(
+    parseInt(requestForm.startTime.split(":")[0]),
+    parseInt(requestForm.startTime.split(":")[1])
+  );
+  return startDate;
 }
-let cardToShow = ref(EnumCardToShow.RecurringOpeningEvent);
+
+function getEndDateEventRequestForm(requestForm: EventRequestForm) {
+  let endDate = new Date(requestForm.day);
+  endDate.setUTCHours(
+    parseInt(requestForm.endTime.split(":")[0]),
+    parseInt(requestForm.endTime.split(":")[1])
+  );
+  return endDate;
+}
+
 const setRecurringOpeningEvent = () => {
+  let startDate = getStartDateEventRequestForm(recurringOpeningEvent);
+  let endDate = getEndDateEventRequestForm(recurringOpeningEvent);
+
+  eventUseCase?.createRecurringOpeningEvent(
+    startDate.toISOString(),
+    endDate.toISOString()
+  );
   cardToShow.value = EnumCardToShow.ScheduledInterventionEvent;
 };
 
 const setScheduledInterventionEvent = () => {
+  let startDate = getStartDateEventRequestForm(scheduledInterventionEvent);
+  let endDate = getEndDateEventRequestForm(scheduledInterventionEvent);
+
+  eventUseCase?.createScheduledInterventionEvent(
+    startDate.toISOString(),
+    endDate.toISOString()
+  );
   cardToShow.value = EnumCardToShow.AvailabilityRequest;
 };
 
@@ -56,7 +98,37 @@ const availabilitiesRequest = reactive({
   color: "blue",
 });
 
-const requestAvailabilities = () => {
+const groupByDay = (table: string[]) => {
+  return table.reduce((acc: { [key: string]: string[] }, curr: string) => {
+    const date = curr.split("T")[0];
+    if (!acc[date]) {
+      acc[date] = [curr];
+    } else {
+      acc[date].push(curr);
+    }
+    return acc;
+  }, {});
+};
+
+const availabilities: Ref<string[]> = ref([]);
+const groupeByDayAvalabilities: Ref<string[][]> = ref([]);
+const requestAvailabilities = async () => {
+  let startDate = new Date(availabilitiesRequest.date.from);
+  let endDate = new Date(availabilitiesRequest.date.to);
+
+  try {
+    availabilities.value =
+      (await eventUseCase?.getAvailabilities(
+        startDate.toISOString(),
+        endDate.toISOString()
+      )) ?? [];
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Error getting availabilities", e);
+  }
+  groupeByDayAvalabilities.value = groupByDay(
+    availabilities.value
+  ) as unknown as string[][];
   cardToShow.value = EnumCardToShow.ShowAvailabilities;
 };
 </script>
@@ -275,54 +347,32 @@ const requestAvailabilities = () => {
           {{ availabilitiesRequest.title }}
         </h6>
       </q-card-section>
-      <!--      <q-card-section>
+      <q-card-section>
         <div class="q-gutter-md row items-start justify-around">
-          <div class="block">
-            <p class="q-ma-xs">
-              From:
-              {{ availabilitiesRequest.date.from }}
-              to
-              {{ availabilitiesRequest.date.to }}
-            </p>
-            <q-date
-              v-model="availabilitiesRequest.date"
-              :mask="availabilitiesRequestMask"
-              :color="availabilitiesRequest.color"
-              range
-            />
-          </div>
-          <div class="block">
-            <p class="q-ma-xs">
-              Select Start time:
-              {{
-                availabilitiesRequest.date?.from.split(" ").reverse().shift() ??
-                ""
-              }}
-            </p>
-            <q-time
-              :format24h="true"
-              v-model="availabilitiesRequest.date.from"
-              :mask="availabilitiesRequestMask"
-              :color="availabilitiesRequest.color"
-            />
-          </div>
-          <div class="block">
-            <p class="q-ma-xs">
-              Select End time:
-              {{
-                availabilitiesRequest.date?.to.split(" ").reverse().shift() ??
-                ""
-              }}
-            </p>
-            <q-time
-              :format24h="true"
-              v-model="availabilitiesRequest.date.to"
-              :mask="availabilitiesRequestMask"
-              :color="availabilitiesRequest.color"
-            />
+          <div
+            v-for="(day, key) in groupeByDayAvalabilities"
+            :key="key"
+            class="justify-center items-center q-card col-auto q-ma-sm"
+          >
+            <div class="q-ma-xs row flex justify-center">
+              {{ new Date(key).toLocaleDateString() }}
+            </div>
+            <div class="row flex justify-center">
+              <q-badge
+                class="q-ma-xs col-auto"
+                v-for="time in day"
+                :key="time"
+                :label="
+                  new Date(time).getHours() +
+                  ':' +
+                  String(new Date(time).getMinutes()).padStart(2, '0')
+                "
+                :color="recurringOpeningEvent.color"
+              />
+            </div>
           </div>
         </div>
-      </q-card-section>-->
+      </q-card-section>
       <q-card-actions class="justify-center">
         <q-btn color="primary" label="Save" @click="requestAvailabilities" />
       </q-card-actions>

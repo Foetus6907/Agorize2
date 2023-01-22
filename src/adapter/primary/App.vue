@@ -1,7 +1,15 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { provide, ref } from "vue";
 const leftDrawerOpen = ref(false);
 import logo from "@/adapter/primary/assets/img/logo.png";
+import EventUseCase from "@/domain/useCase/EventUseCase";
+import EventRepositoryIM from "@/adapter/secondary/inMemory/InMemoryRepository";
+import { EventUseCaseKey } from "@/adapter/primary/symbols";
+
+const eventRepositoryIM = new EventRepositoryIM();
+const eventUseCase = new EventUseCase(eventRepositoryIM);
+
+provide(EventUseCaseKey, eventUseCase);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;

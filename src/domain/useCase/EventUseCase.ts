@@ -42,34 +42,40 @@ export default class EventUseCase {
    *
    */
   async getAvailabilities(fromDate: string, toDate: string): Promise<string[]> {
-    const allSlots: Array<string> = [];
-    this.eventList = await this.getEvents();
-    this.eventList
-      .filter((event) => event.opening && event.recurring)
-      .forEach((event) => {
-        allSlots.push(...this.getAllTimeSlots(event.startDate, event.endDate));
-      });
+    try {
+      const allSlots: Array<string> = [];
+      this.eventList = await this.getEvents();
+      this.eventList
+        .filter((event) => event.opening && event.recurring)
+        .forEach((event) => {
+          allSlots.push(
+            ...this.getAllTimeSlots(event.startDate, event.endDate)
+          );
+        });
 
-    let availableSlots: Array<string> = allSlots;
-    this.eventList
-      .filter((event) => !event.opening && !event.recurring)
-      .forEach((event) => {
-        availableSlots = this.removeSlotsMachingInterventionEvent(
-          availableSlots,
-          event
+      let availableSlots: Array<string> = allSlots;
+      this.eventList
+        .filter((event) => !event.opening && !event.recurring)
+        .forEach((event) => {
+          availableSlots = this.removeSlotsMachingInterventionEvent(
+            availableSlots,
+            event
+          );
+        });
+
+      /*get available slot between fromDate and endDate*/
+      const matchingSlot: Array<string> = availableSlots.filter((slot) => {
+        return (
+          new Date(slot) >= new Date(fromDate) &&
+          new Date(slot) <= new Date(toDate)
         );
       });
 
-    /*get available slot between fromDate and endDate*/
-    const matchingSlot: Array<string> = availableSlots.filter((slot) => {
-      return (
-        new Date(slot) >= new Date(fromDate) &&
-        new Date(slot) <= new Date(toDate)
-      );
-    });
-
-    /*remove last slot if it is not a full slot*/
-    return matchingSlot.splice(0, matchingSlot.length - 1);
+      /*remove last slot if it is not a full slot*/
+      return matchingSlot.splice(0, matchingSlot.length - 1);
+    } catch (e: any) {
+      throw new Error(e);
+    }
   }
 
   /*
