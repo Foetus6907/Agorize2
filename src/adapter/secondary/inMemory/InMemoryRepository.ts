@@ -8,7 +8,11 @@ export default class EventRepositoryIM implements EventRepository {
     this.eventList = [];
   }
 
-  async getEvents(): Promise<Event[]> {
-    return this.eventList;
+  getEvents(): Promise<Event[]> {
+    return Promise.resolve(this.eventList);
+  }
+
+  addEvent(event: Event): void {
+    this.eventList.push(event);
   }
 }

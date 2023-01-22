@@ -2,21 +2,20 @@ import EventRepository from "@/port/Event/EventRepository";
 import Event from "@/domain/model/Event";
 
 export default class EventUseCase {
-  private eventList: Event[];
+  private eventList: Event[] = [];
   private slotTime = 30;
   private numberRecurringWeeks = 2;
   private readonly eventRepository: EventRepository;
 
   constructor(eventRepository: EventRepository) {
     this.eventRepository = eventRepository;
-    this.eventList = [];
     this.getEvents().then((events) => {
       this.eventList = events;
     });
   }
 
   async getEvents(): Promise<Event[]> {
-    return this.eventList;
+    return await this.eventRepository.getEvents();
   }
 
   async createRecurringOpeningEvent(
@@ -24,7 +23,7 @@ export default class EventUseCase {
     endDate: string
   ): Promise<void> {
     const event = new Event(true, true, startDate, endDate);
-    this.eventList.push(event);
+    this.eventRepository.addEvent(event);
   }
 
   async createScheduledInterventionEvent(
@@ -32,7 +31,7 @@ export default class EventUseCase {
     endDate: string
   ): Promise<void> {
     const event = new Event(false, false, startDate, endDate);
-    this.eventList.push(event);
+    this.eventRepository.addEvent(event);
   }
 
   /*
@@ -44,7 +43,7 @@ export default class EventUseCase {
    */
   async getAvailabilities(fromDate: string, toDate: string): Promise<string[]> {
     const allSlots: Array<string> = [];
-
+    this.eventList = await this.getEvents();
     this.eventList
       .filter((event) => event.opening && event.recurring)
       .forEach((event) => {
