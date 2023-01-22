@@ -101,19 +101,21 @@ export default class EventUseCase {
     const startDate: Date = new Date(fromDate);
     let endDate: Date = new Date(toDate);
     const diffEnMilliseconde = endDate.getTime() - startDate.getTime();
-    const diffEnHeures = diffEnMilliseconde / (1000 * 60 * 60);
+    const diffEnHeures = diffEnMilliseconde / (1000 * 60 * 60); // 1000 ms * 60 s * 60 min = 1h in ms
 
     const timeSlots: string[] = [];
 
     for (let o = 0; o < this.numberRecurringWeeks; o++) {
-      endDate = new Date(endDate.setDate(endDate.getDate() + 7));
+      // for each week
+      endDate = new Date(endDate.setDate(endDate.getDate() + 7)); // add 7 days = 1 week
     }
 
     while (startDate < endDate) {
       for (let i = 0; i < this.numberRecurringWeeks; i++) {
+        // for each week
         for (let i = 0; i <= diffEnHeures * 2; i++) {
           timeSlots.push(startDate.toISOString());
-          startDate.setMinutes(startDate.getMinutes() + this.slotTime);
+          startDate.setMinutes(startDate.getMinutes() + this.slotTime); // add 30 min = 1 slot
         }
         startDate.setDate(startDate.getDate() + 7);
         startDate.setHours(new Date(fromDate).getHours());
